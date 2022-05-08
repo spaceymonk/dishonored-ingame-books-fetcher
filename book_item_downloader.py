@@ -46,7 +46,7 @@ def parse_transcript(soup):
         while tag != None and not ('location' in str(tag.string).strip().lower() and tag.name == 'h2'):
             if tag.name == 'p':
                 text = tag.get_text().strip().replace('\n', '<br />')
-                transcript_html += text
+                transcript_html += f'<p>{text}</p>'
             if tag.name == 'h2':
                 text = str(tag.string)
                 transcript_html += f'<h2>{text}</h2>'
