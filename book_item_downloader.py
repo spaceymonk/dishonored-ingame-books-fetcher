@@ -38,19 +38,26 @@ def generate_book(book_item, base_url=BASE_URL):
 
 
 def parse_transcript(soup):
-    paragraphs = []
+    transcript_html = ''
     tag = soup.find(id='Transcript')
     if tag is None:
-        raise Exception('No transcript found')
-    tag = tag.parent.next_sibling
-    while tag != None and tag.name != 'h2':
-        if tag.name == 'p':
-            text = tag.get_text().strip().replace('\n', '<br />')
-            paragraphs.append(text)
-        tag = tag.next_sibling
-    transcript_html = ''
-    for paragraph in paragraphs:
-        transcript_html += f'<p>{paragraph}</p>'
+        print('No transcript found, failsafe activated')
+        tag = soup.select_one('#mw-content-text > div.mw-parser-output > h2')
+        while tag != None and not ('location' in str(tag.string).strip().lower() and tag.name == 'h2'):
+            if tag.name == 'p':
+                text = tag.get_text().strip().replace('\n', '<br />')
+                transcript_html += text
+            if tag.name == 'h2':
+                text = str(tag.string)
+                transcript_html += f'<h2>{text}</h2>'
+            tag = tag.next_sibling
+    else:
+        tag = tag.parent.next_sibling
+        while tag != None and tag.name != 'h2':
+            if tag.name == 'p':
+                text = tag.get_text().strip().replace('\n', '<br />')
+                transcript_html += f'<p>{text}</p>'
+            tag = tag.next_sibling
     return transcript_html
 
 
